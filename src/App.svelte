@@ -11,39 +11,44 @@
   }
 
   async function fetchMenuItems(projectId = null) {
+    const url =
+      projectId === null
+        ? "http://localhost:5000/api/projects"
+        : `http://localhost:5000/api/environments/${projectId}`;
+
     try {
-      const url =
-        projectId === null
-          ? "http://localhost:5000/api/projects"
-          : `http://localhost:5000/api/environments/${projectId}`;
-
       const response = await fetch(url);
-
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
       }
-
-      projectId === null
-        ? (menuItems = await response.json())
-        : (subMenuItems = await response.json());
+      return response.json();
     } catch (error) {
       console.error("Fetching menu items failed:", error);
+      return [];
     }
   }
 
   function handleMenuItemClick(itemId) {
     if (activeMenuItemId === itemId) {
       activeMenuItemId = null;
-      subMenuItems = [];
     } else {
-      subMenuItems = [];
       activeMenuItemId = itemId;
-      fetchMenuItems(itemId);
     }
   }
 
-  onMount(async () => {
-    fetchMenuItems();
+  $: if (activeMenuItemId === null) {
+    subMenuItems = [];
+  } else {
+    subMenuItems = [];
+    fetchMenuItems(activeMenuItemId).then((items) => {
+      subMenuItems = items;
+    });
+  }
+
+  onMount(() => {
+    fetchMenuItems().then((items) => {
+      menuItems = items;
+    });
   });
 </script>
 
@@ -56,27 +61,29 @@
   </nav>
 
   <div class="menu" class:open={menuOpen}>
-    <ul>
-      {#each menuItems as item}
-        <li>
-          <button
-            class="menu-button"
-            on:click={() => handleMenuItemClick(item.id)}
-          >
-            {item.project_name}
-          </button>
-          {#if activeMenuItemId === item.id && subMenuItems.length > 0}
-            <ul class="submenu">
+    {#each menuItems as item}
+      <div>
+        <button
+          class="menu-button"
+          on:click={() => handleMenuItemClick(item.id)}
+        >
+          {item.project_name}
+        </button>
+        {#if activeMenuItemId === item.id && subMenuItems !== undefined}
+          {#if subMenuItems.length > 0}
+            <div class="submenu">
               {#each subMenuItems as subItem}
-                <li>
+                <div>
                   <button>{subItem.environment}</button>
-                </li>
+                </div>
               {/each}
-            </ul>
+            </div>
+          {:else}
+            <div>No submenu items found.</div>
           {/if}
-        </li>
-      {/each}
-    </ul>
+        {/if}
+      </div>
+    {/each}
   </div>
 
   <div class="content" class:full={!menuOpen}>
