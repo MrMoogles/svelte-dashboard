@@ -1,6 +1,6 @@
+/* Full viewport height */
 .dashboard {
     height: 100vh;
-    /* Full viewport height */
 }
 
 .navbar {
@@ -11,8 +11,7 @@
 .menu {
     width: 0;
     transition: width 0.3s ease;
-    height: 100%;
-    /* Full height */
+    height: 100%; /* Full height */
     overflow: hidden;
     background-color: skyblue;
 }
@@ -26,12 +25,10 @@
     background-color: #f8f8f8;
     width: 100%;
     text-align: left;
-    /* Add more styling as needed */
 }
 
 .menu-button:focus {
     outline: none;
-    /* Style for focus state */
     background-color: #e0e0e0;
 }
 
