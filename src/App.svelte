@@ -1,16 +1,13 @@
 <script>
   import { onMount } from "svelte";
   import "./AppStyles.css";
-  //TODO: Remove MenuOpen from code. The Menu is static now
-  let menuOpen = false;
   let menuItems = [];
   let subMenuItems = [];
   let activeMenuItemId = null;
   let testRunContent = [];
 
-  function toggleMenu() {
-    menuOpen = !menuOpen;
-  }
+  // For handling style of the selected environment
+  let selectedEnvironment = null;
 
   async function fetchMenuItems(projectId = null) {
     const url =
@@ -38,7 +35,8 @@
     }
   }
 
-  async function handleSubMenuItemClick(environmentId, projectId) {
+  async function handleSubMenuItemClick(environmentId, projectId, button) {
+    selectedEnvironment = button;
     const url = `http://localhost:5000/api/test-runs?environment=${environmentId}&project=${projectId}`;
 
     try {
@@ -95,8 +93,11 @@
               <div class="sub-menu">
                 {#each subMenuItems as subItem}
                   <button
-                    class="sub-button"
-                    on:click={() => handleSubMenuItemClick(subItem.id, item.id)}
+                    class="sub-button {selectedEnvironment === subItem
+                      ? 'selected'
+                      : ''}"
+                    on:click={() =>
+                      handleSubMenuItemClick(subItem.id, item.id, subItem)}
                     >{subItem.environment}</button
                   >
                 {/each}
@@ -109,34 +110,40 @@
       {/each}
     </div>
   </aside>
-  <div class="content" class:full={!menuOpen}>
-    {#if testRunContent && testRunContent.length > 0}
-      <table>
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Job Number</th>
-            <th>Environment ID</th>
-            <th>Project ID</th>
-            <th>Run Date</th>
-            <th>Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          {#each testRunContent as testRun}
+  <div class="content">
+    <div class="section-1">
+      {#if testRunContent && testRunContent.length > 0}
+        <table class="table">
+          <thead>
             <tr>
-              <td>{testRun.id}</td>
-              <td>{testRun.job_number}</td>
-              <td>{testRun.environment_id}</td>
-              <td>{testRun.project_id}</td>
-              <td>{testRun.run_date}</td>
-              <td>{testRun.status}</td>
+              <th>ID</th>
+              <th>Job Number</th>
+              <th>Environment ID</th>
+              <th>Project ID</th>
+              <th>Run Date</th>
+              <th>Status</th>
             </tr>
-          {/each}
-        </tbody>
-      </table>
-    {:else}
-      <div>Select a menu item to see details here.</div>
-    {/if}
+          </thead>
+          <tbody>
+            {#each testRunContent as testRun}
+              <tr>
+                <td>{testRun.id}</td>
+                <td>{testRun.job_number}</td>
+                <td>{testRun.environment_id}</td>
+                <td>{testRun.project_id}</td>
+                <td>{testRun.run_date}</td>
+                {#if testRun.status === "PASS"}
+                  <td class="status-pass">{testRun.status}</td>
+                {:else}
+                  <td class="status-fail">{testRun.status}</td>
+                {/if}
+              </tr>
+            {/each}
+          </tbody>
+        </table>
+      {:else}
+        <div>Select a menu item to see details here.</div>
+      {/if}
+    </div>
   </div>
 </div>
