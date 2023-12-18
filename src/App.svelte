@@ -1,4 +1,7 @@
 <script>
+  //TODO: Maybe divide this up this section up to appropriate components
+  // DB Component
+  // Menu Component
   import SvelteTable from "svelte-table";
   import { onMount } from "svelte";
   import "./AppStyles.css";
