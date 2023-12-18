@@ -213,3 +213,8 @@ aside .sidebar:hover {
     color: #E74C3C;
     font-weight: bold;
 }
+
+.table .status-skipped {
+    color: #ffeb14;
+    font-weight: bold;
+}

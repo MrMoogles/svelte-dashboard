@@ -1,4 +1,5 @@
 <script>
+  import SvelteTable from "svelte-table";
   import { onMount } from "svelte";
   import "./AppStyles.css";
   let menuItems = [];
@@ -64,6 +65,36 @@
       menuItems = items;
     });
   });
+
+  // Define columns for SvelteTable
+  let cols = [
+    { key: "id", title: "ID", value: (row) => row.id },
+    { key: "jobNum", title: "Job Number", value: (row) => row.job_number },
+    {
+      key: "environment",
+      title: "Environment ID",
+      value: (row) => row.environment_id,
+    },
+    { key: "project", title: "Project ID", value: (row) => row.project_id },
+    {
+      key: "runDate",
+      title: "Run Date",
+      value: (row) => row.run_date,
+      sortable: true,
+    },
+    {
+      key: "status",
+      title: "Status",
+      value: (row) => row.status,
+      sortable: true,
+      class: (row) => {
+        if (row.status === "PASS") return "status-pass";
+        if (row.status === "SKIPPED") return "status-skipped";
+        if (row.status === "FAIL") return "status-fail";
+        return "";
+      },
+    },
+  ];
 </script>
 
 <div class="container">
@@ -113,34 +144,11 @@
   <div class="content">
     <div class="section-1">
       {#if testRunContent && testRunContent.length > 0}
-        <table class="table">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Job Number</th>
-              <th>Environment ID</th>
-              <th>Project ID</th>
-              <th>Run Date</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {#each testRunContent as testRun}
-              <tr>
-                <td>{testRun.id}</td>
-                <td>{testRun.job_number}</td>
-                <td>{testRun.environment_id}</td>
-                <td>{testRun.project_id}</td>
-                <td>{testRun.run_date}</td>
-                {#if testRun.status === "PASS"}
-                  <td class="status-pass">{testRun.status}</td>
-                {:else}
-                  <td class="status-fail">{testRun.status}</td>
-                {/if}
-              </tr>
-            {/each}
-          </tbody>
-        </table>
+        <SvelteTable
+          rows={testRunContent}
+          columns={cols}
+          classNameTable={["table"]}
+        />
       {:else}
         <div>Select a menu item to see details here.</div>
       {/if}
