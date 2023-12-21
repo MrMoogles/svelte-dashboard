@@ -1,7 +1,5 @@
 /node_modules/
-/public/build/
-
 .DS_Store
 
-package-lock.json
 sql/create_template.sql
+package-lock.json
